@@ -2,6 +2,7 @@ package com.openclassrooms.rentals.controllers;
 
 import com.openclassrooms.rentals.dto.LoginRequest;
 import com.openclassrooms.rentals.dto.RegisterRequest;
+import com.openclassrooms.rentals.dto.UserResponse;
 import com.openclassrooms.rentals.dto.JwtResponse;
 import com.openclassrooms.rentals.models.User;
 import com.openclassrooms.rentals.security.JwtTokenProvider;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,5 +64,12 @@ public class AuthenticationController {
 
         String jwt = jwtTokenProvider.generateToken(authentication);
         return ResponseEntity.ok(new JwtResponse(jwt));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+        UserResponse userResponse = userService.getUserResponse(email);
+        return ResponseEntity.ok(userResponse);
     }
 }

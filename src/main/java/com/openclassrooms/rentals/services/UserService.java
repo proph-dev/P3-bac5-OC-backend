@@ -1,5 +1,6 @@
 package com.openclassrooms.rentals.services;
 
+import com.openclassrooms.rentals.dto.UserResponse;
 import com.openclassrooms.rentals.models.User;
 import com.openclassrooms.rentals.repository.UserRepository;
 
@@ -38,4 +39,10 @@ public class UserService implements UserDetailsService {
                 .authorities("USER")
                 .build();
     }
+
+    public UserResponse getUserResponse(String email) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    return new UserResponse(user.getEmail(), user.getName());
+}
 }
