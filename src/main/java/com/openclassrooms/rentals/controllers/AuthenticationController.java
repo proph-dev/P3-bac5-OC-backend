@@ -62,7 +62,7 @@ public class AuthenticationController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = jwtTokenProvider.generateToken(authentication);
+        String jwt = jwtTokenProvider.generateToken(loginRequest.getEmail());
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 

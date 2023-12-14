@@ -4,7 +4,6 @@ import com.openclassrooms.rentals.dto.UserResponse;
 import com.openclassrooms.rentals.models.User;
 import com.openclassrooms.rentals.repository.UserRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +18,6 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -41,8 +39,14 @@ public class UserService implements UserDetailsService {
     }
 
     public UserResponse getUserResponse(String email) {
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-    return new UserResponse(user.getEmail(), user.getName());
-}
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        return new UserResponse(user.getEmail(), user.getName());
+    }
+
+    public Long getUserIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+            .map(User::getId)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
 }

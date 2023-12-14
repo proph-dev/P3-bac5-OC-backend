@@ -7,17 +7,38 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.openclassrooms.rentals.security.JwtTokenFilter;
+import com.openclassrooms.rentals.security.JwtTokenProvider;
+
+import java.nio.charset.StandardCharsets;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity  
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${app.jwtSecret}")
+    private String jwtSecret;
+    
     @Autowired
-    private JwtTokenFilter jwtTokenFilter;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Bean
+    public JwtTokenFilter jwtTokenFilter() {
+        return new JwtTokenFilter(userDetailsService, jwtTokenProvider);
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -30,7 +51,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/auth/me").authenticated()
             .anyRequest().authenticated()
             .and()
-            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class); // Utilisez la méthode jwtTokenFilter ici
     }
 
     @Override
