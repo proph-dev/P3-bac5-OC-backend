@@ -33,7 +33,7 @@ public class RentalService {
         rental.setName(rentalDTO.getName());
         rental.setSurface(rentalDTO.getSurface());
         rental.setPrice(rentalDTO.getPrice());
-        //rental.setPicture(rentalDTO.getPicture());
+        rental.setPicture(rentalDTO.getPicture());
         rental.setDescription(rentalDTO.getDescription());
         rental.setOwnerId(rentalDTO.getOwnerId());
         rental.setCreatedAt(LocalDateTime.now());
@@ -49,7 +49,7 @@ public class RentalService {
         rental.setName(rentalDTO.getName());
         rental.setSurface(rentalDTO.getSurface());
         rental.setPrice(rentalDTO.getPrice());
-        //rental.setPicture(rentalDTO.getPicture());
+        rental.setPicture(rentalDTO.getPicture());
         rental.setDescription(rentalDTO.getDescription());
         rental.setUpdatedAt(LocalDateTime.now());
 

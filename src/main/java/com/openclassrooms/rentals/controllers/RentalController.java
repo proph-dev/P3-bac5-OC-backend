@@ -1,22 +1,16 @@
 package com.openclassrooms.rentals.controllers;
 
 import com.openclassrooms.rentals.dto.RentalDTO;
+import com.openclassrooms.rentals.dto.RentalResponse;
 import com.openclassrooms.rentals.models.Rental;
-import com.openclassrooms.rentals.security.JwtTokenFilter;
 import com.openclassrooms.rentals.security.JwtTokenProvider;
 import com.openclassrooms.rentals.services.RentalService;
 import com.openclassrooms.rentals.services.UserService;
 
-import io.jsonwebtoken.Jwts;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.openclassrooms.rentals.services.FileStorageService;
 
 import java.util.List;
@@ -41,12 +35,14 @@ public class RentalController {
 
     // GET all rentals
     @GetMapping
-    public ResponseEntity<List<RentalDTO>> getAllRentals() {
+    public ResponseEntity<RentalResponse> getAllRentals() {
         List<Rental> rentals = rentalService.findAll();
         List<RentalDTO> rentalDTOs = rentals.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(rentalDTOs);
+
+        RentalResponse rentalResponse = new RentalResponse(rentalDTOs);
+        return ResponseEntity.ok(rentalResponse);
     }
 
     // GET a single rental by ID
@@ -61,16 +57,16 @@ public class RentalController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RentalDTO> createRental (@ModelAttribute RentalDTO rentalDTO, 
                                                     @RequestHeader("Authorization") String token) {
-        
+        if(token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
         String userEmail = jwtTokenProvider.getEmailFromToken(token);
         Long userId = userService.getUserIdByEmail(userEmail);
-
         rentalDTO.setOwnerId(userId);
 
-        System.out.println(userEmail);
-        // String fileName = fileStorageService.storeFile(file);
-
-        // rentalDTO.setPicture(fileDownloadUri);
+        String fileName = fileStorageService.storeFile(rentalDTO.getFile());
+        rentalDTO.setPicture(fileName);
 
         Rental rental = rentalService.createRental(rentalDTO);
         RentalDTO createdRentalDTO = convertToDto(rental);
@@ -92,7 +88,7 @@ public class RentalController {
         rentalDTO.setName(rental.getName());
         rentalDTO.setSurface(rental.getSurface());
         rentalDTO.setPrice(rental.getPrice());
-        //rentalDTO.setPicture(rental.getPicture());
+        rentalDTO.setPicture(rental.getPicture());
         rentalDTO.setDescription(rental.getDescription());
         rentalDTO.setOwnerId(rental.getOwnerId());
         rentalDTO.setCreatedAt(rental.getCreatedAt());

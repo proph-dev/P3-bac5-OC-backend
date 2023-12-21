@@ -19,7 +19,7 @@ public class FileStorageService {
     // Méthode pour stocker le fichier
     public String storeFile(MultipartFile file) {
         // Normalise le nom du fichier
-        String fileName = cleanPath(file.getOriginalFilename());
+        String fileName = file.getOriginalFilename();
 
         try {
             // Vérification pour empêcher le stockage de fichiers avec des chemins relatifs malveillants
@@ -29,17 +29,13 @@ public class FileStorageService {
 
             // Copie le fichier au lieu de stockage, en remplaçant le même nom de fichier s'il existe déjà
             Path targetLocation = Paths.get(fileStorageLocation).resolve(fileName);
+            System.out.println(targetLocation.toAbsolutePath().toFile().getAbsolutePath());
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             return fileName;
         } catch (IOException ex) {
             throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
         }
-    }
-
-    // Méthode personnalisée pour nettoyer le chemin du fichier
-    private String cleanPath(String path) {
-        return path.replaceAll("[.]+", "");
     }
 }
 

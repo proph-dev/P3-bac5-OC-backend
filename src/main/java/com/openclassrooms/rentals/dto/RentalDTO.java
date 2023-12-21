@@ -9,7 +9,8 @@ public class RentalDTO {
     private String name;
     private double surface;
     private double price;
-    private MultipartFile picture;
+    private String picture;
+    private MultipartFile file;
     private String description;
     private Long ownerId;
     private LocalDateTime createdAt;
@@ -32,8 +33,12 @@ public class RentalDTO {
         return price;
     }
 
-    public MultipartFile getPicture() {
+    public String getPicture() {
         return picture;
+    }
+
+    public MultipartFile getFile() {
+        return file;
     }
 
     public String getDescription() {
@@ -69,8 +74,12 @@ public class RentalDTO {
         this.price = price;
     }
 
-    public void setPicture(MultipartFile picture) {
+    public void setPicture(String picture) {
         this.picture = picture;
+    }
+
+    public void setFile(MultipartFile file) {
+        this.file = file;
     }
 
     public void setDescription(String description) {

@@ -33,8 +33,12 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
         Key signKey = getSignKey();
     
+        Claims claims = Jwts.claims().setSubject(email);
+
         return Jwts.builder()
                 .setSubject(email)
+                .setClaims(claims)
+                .claim("email", email)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(signKey, SignatureAlgorithm.HS256)
@@ -64,15 +68,14 @@ public class JwtTokenProvider {
     }
 
     public String getEmailFromToken(String token) {
-        System.err.println(token);
-        System.out.println(token);
-        Claims claims = Jwts
+        System.out.println("token :" + token);
+        String email = Jwts
                 .parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody();
+                .getBody().getSubject();
 
-        return claims.getSubject();
+        return email;
     }
 }
