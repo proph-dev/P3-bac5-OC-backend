@@ -2,10 +2,13 @@ package com.openclassrooms.rentals.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MessageDTO {
     private Long id;
     private String message;
     private Long userId;
+    @JsonProperty("rental_id")
     private Long rentalId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
