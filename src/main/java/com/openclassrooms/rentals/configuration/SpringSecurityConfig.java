@@ -2,22 +2,39 @@ package com.openclassrooms.rentals.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.openclassrooms.rentals.security.JwtTokenFilter;
+import com.openclassrooms.rentals.security.JwtTokenProvider;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity  
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${app.jwtSecret}")
+    private String jwtSecret;
+    
     @Autowired
-    private JwtTokenFilter jwtTokenFilter;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Bean
+    public JwtTokenFilter jwtTokenFilter() {
+        return new JwtTokenFilter(userDetailsService, jwtTokenProvider);
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -26,11 +43,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-            .antMatchers("/api/auth/login", "/api/auth/register").permitAll()
+            .antMatchers("/swagger-ui/**", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
+            .antMatchers("/api/auth/login", "/api/auth/register", "/backend/img/**").permitAll()
             .antMatchers("/api/auth/me").authenticated()
             .anyRequest().authenticated()
             .and()
-            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class); // Utilisez la méthode jwtTokenFilter ici
     }
 
     @Override
