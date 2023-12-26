@@ -1,5 +1,6 @@
 package com.openclassrooms.rentals.services;
 
+import com.openclassrooms.rentals.dto.RentalCreateDTO;
 import com.openclassrooms.rentals.dto.RentalDTO;
 import com.openclassrooms.rentals.models.Rental;
 import com.openclassrooms.rentals.repository.RentalRepository;
@@ -27,13 +28,13 @@ public class RentalService {
     }
 
     // Créer un nouveau rental
-    public Rental createRental(RentalDTO rentalDTO) {
+    public Rental createRental(RentalCreateDTO rentalDTO, String fileName) {
         Rental rental = new Rental();
         // Initialiser rental avec les données de rentalDTO
         rental.setName(rentalDTO.getName());
         rental.setSurface(rentalDTO.getSurface());
         rental.setPrice(rentalDTO.getPrice());
-        rental.setPicture(rentalDTO.getPicture());
+        rental.setPicture(fileName);
         rental.setDescription(rentalDTO.getDescription());
         rental.setOwnerId(rentalDTO.getOwnerId());
         rental.setCreatedAt(LocalDateTime.now());
@@ -49,7 +50,6 @@ public class RentalService {
         rental.setName(rentalDTO.getName());
         rental.setSurface(rentalDTO.getSurface());
         rental.setPrice(rentalDTO.getPrice());
-        rental.setPicture(rentalDTO.getPicture());
         rental.setDescription(rentalDTO.getDescription());
         rental.setUpdatedAt(LocalDateTime.now());
 

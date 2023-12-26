@@ -12,9 +12,11 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class FileStorageService {
 
-    // Chemin du répertoire de stockage des fichiers, défini dans application.properties
     @Value("${file.upload-dir}")
     private String fileStorageLocation;
+
+    @Value("${server.base-url}")
+    private String baseUrl;
 
     // Méthode pour stocker le fichier
     public String storeFile(MultipartFile file) {
@@ -29,11 +31,10 @@ public class FileStorageService {
 
             // Copie le fichier au lieu de stockage, en remplaçant le même nom de fichier s'il existe déjà
             Path targetLocation = Paths.get(fileStorageLocation).resolve(fileName);
-            System.out.println(targetLocation.toAbsolutePath().toFile().getAbsolutePath());
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            return fileName;
-        } catch (IOException ex) {
+            return baseUrl + "/backend/img/" + fileName;
+            } catch (IOException ex) {
             throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
         }
     }

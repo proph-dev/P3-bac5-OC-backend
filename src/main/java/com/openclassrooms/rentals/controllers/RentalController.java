@@ -1,5 +1,6 @@
 package com.openclassrooms.rentals.controllers;
 
+import com.openclassrooms.rentals.dto.RentalCreateDTO;
 import com.openclassrooms.rentals.dto.RentalDTO;
 import com.openclassrooms.rentals.dto.RentalResponse;
 import com.openclassrooms.rentals.models.Rental;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.openclassrooms.rentals.services.FileStorageService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +57,7 @@ public class RentalController {
 
     // POST a new rental
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<RentalDTO> createRental (@ModelAttribute RentalDTO rentalDTO, 
+    public ResponseEntity<RentalDTO> createRental (@ModelAttribute RentalCreateDTO rentalDTO, 
                                                     @RequestHeader("Authorization") String token) {
         if(token.startsWith("Bearer ")) {
             token = token.substring(7);
@@ -65,17 +67,31 @@ public class RentalController {
         Long userId = userService.getUserIdByEmail(userEmail);
         rentalDTO.setOwnerId(userId);
 
-        String fileName = fileStorageService.storeFile(rentalDTO.getFile());
-        rentalDTO.setPicture(fileName);
+        String fileName = fileStorageService.storeFile(rentalDTO.getPicture());
 
-        Rental rental = rentalService.createRental(rentalDTO);
+        Rental rental = rentalService.createRental(rentalDTO, fileName);
         RentalDTO createdRentalDTO = convertToDto(rental);
         return ResponseEntity.ok(createdRentalDTO);
     }
 
     // PUT (update) a rental
     @PutMapping("/{id}")
-    public ResponseEntity<RentalDTO> updateRental(@PathVariable Long id, @RequestBody RentalDTO rentalDTO) {
+    public ResponseEntity<RentalDTO> updateRental(@PathVariable Long id, @ModelAttribute RentalDTO rentalDTO) {
+        Rental rental = rentalService.findById(id);
+
+        // Mettre à jour les propriétés de rental avec celles de rentalDTO
+        rental.setName(rentalDTO.getName());
+        rental.setSurface(rentalDTO.getSurface());
+        rental.setPrice(rentalDTO.getPrice());
+        rental.setDescription(rentalDTO.getDescription());
+        rental.setUpdatedAt(LocalDateTime.now());
+
+        // Vérifier s'il y a une nouvelle image à télécharger
+        if (rentalDTO.getNewPicture() != null && !rentalDTO.getNewPicture().isEmpty()) {
+            String newFileName = fileStorageService.storeFile(rentalDTO.getNewPicture());
+            rental.setPicture(newFileName);
+        }
+
         Rental updatedRental = rentalService.updateRental(id, rentalDTO);
         RentalDTO updatedRentalDTO = convertToDto(updatedRental);
         return ResponseEntity.ok(updatedRentalDTO);

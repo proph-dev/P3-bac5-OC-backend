@@ -4,13 +4,12 @@ import java.time.LocalDateTime;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class RentalDTO {
+public class RentalCreateDTO {
     private Long id;
     private String name;
     private double surface;
     private double price;
-    private String picture;
-    private MultipartFile newPicture;
+    private MultipartFile picture;
     private String description;
     private Long ownerId;
     private LocalDateTime createdAt;
@@ -33,12 +32,8 @@ public class RentalDTO {
         return price;
     }
 
-    public String getPicture() {
+    public MultipartFile getPicture() {
         return picture;
-    }
-
-    public MultipartFile getNewPicture() {
-        return newPicture;
     }
 
     public String getDescription() {
@@ -74,12 +69,8 @@ public class RentalDTO {
         this.price = price;
     }
 
-    public void setPicture(String picture) {
+    public void setPicture(MultipartFile picture) {
         this.picture = picture;
-    }
-
-    public void setNewPicture(MultipartFile newPicture) {
-        this.newPicture = newPicture;
     }
 
     public void setDescription(String description) {
