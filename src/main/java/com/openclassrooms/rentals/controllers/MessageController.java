@@ -27,8 +27,6 @@ public class MessageController {
             String userEmail = authentication.getName();
             Long userId = userService.getUserIdByEmail(userEmail);
 
-            Long rentalId = messageDTO.getRentalId();
-
             messageDTO.setUserId(userId);
 
             Message message = messageService.createMessage(messageDTO);
